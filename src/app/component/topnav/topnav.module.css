@@ -1,0 +1,19 @@
+.main{
+    height: 70px;
+    background-color: aliceblue;
+    width: 95%;
+    margin: 20px auto;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, #051650, rgba(5, 22, 80, 0));
+    border-radius: 10px;
+}
+
+.content{
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    padding: 20px 40px;
+    align-items: center;
+    font-size: 25px;
+    gap: 12px;
+}

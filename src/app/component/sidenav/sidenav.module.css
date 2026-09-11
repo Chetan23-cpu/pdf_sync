@@ -1,0 +1,52 @@
+.main{
+    width: 300px;
+    background: linear-gradient(to bottom, #051650, rgba(5, 22, 80, 0));
+    color: white;
+    height: 100vh;
+    padding: 50px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.module{
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard, .bills,.employees, .users, .locations, .divisions, .activity{
+    display: flex;
+    flex-direction: row;
+    gap:15px;
+    align-items: center;
+    margin-top: 35px;
+    padding: 12px 25px;
+    cursor: pointer;
+
+   
+}
+.dashboard:hover, .bills:hover,.employees:hover, .users:hover, .locations:hover, .divisions:hover, .activity:hover{
+     padding: 12px 25px;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #0A2472, #051650);
+    transform: scaleY(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+
+.icon{
+font-size: 28px;
+}
+.label{
+    font-size: 20px;
+}
+
+.logout{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}

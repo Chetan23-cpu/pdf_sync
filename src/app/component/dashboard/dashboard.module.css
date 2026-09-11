@@ -1,0 +1,10 @@
+.main{
+    display: flex;
+    flex-direction: row;
+    background-color: #00072D;
+}
+.topnav{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
