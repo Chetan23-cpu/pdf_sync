@@ -37,20 +37,29 @@ const Sitespage = () => {
   }, []);
 
   const handleSaveSite = async (site) => {
+    setError(null);
     try {
       if (site.id) {
-        await fetch(`/api/sites/${site.id}`, {
+        const res = await fetch(`/api/sites/${site.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(site),
         });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Update failed (${res.status})`);
+        }
         setEditingSite(null);
       } else {
-        await fetch("/api/sites", {
+        const res = await fetch("/api/sites", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(site),
         });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Create failed (${res.status})`);
+        }
         setAddSiteModal(false);
       }
       await fetchSites();
@@ -60,8 +69,12 @@ const Sitespage = () => {
   };
 
   const handleConfirmDelete = async (id) => {
+    setError(null);
     try {
-      await fetch(`/api/sites/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/sites/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        throw new Error(`Delete failed (${res.status})`);
+      }
       setDeletingSite(null);
       await fetchSites();
     } catch (err) {
