@@ -30,13 +30,6 @@ export async function GET() {
     );
     log.push(`Delta returned ${items.length} changed item(s)`);
 
-    // TEMPORARY DEBUG: log what each item actually looks like
-    for (const item of items) {
-      log.push(
-        `Item: name="${item.name}", isFolder=${!!item.folder}, isFile=${!!item.file}, isDeleted=${!!item.deleted}`,
-      );
-    }
-
     const results = [];
 
     for (const item of items) {
@@ -51,15 +44,7 @@ export async function GET() {
         continue;
       }
 
-      const downloadUrl = item["@microsoft.graph.downloadUrl"];
-      if (!downloadUrl) {
-        log.push(
-          `Skipping ${item.name}: no downloadUrl found. Available keys: ${Object.keys(item).join(", ")}`,
-        );
-        continue;
-      }
-
-      const fileBuffer = await downloadFile(downloadUrl);
+      const fileBuffer = await downloadFile(token, driveId, item.id);
       log.push(`Downloaded ${item.name} (${fileBuffer.length} bytes)`);
 
       for (const site of sites) {

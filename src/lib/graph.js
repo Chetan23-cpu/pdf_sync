@@ -85,8 +85,11 @@ export async function getDelta(token, driveId, deltaLink) {
   };
 }
 
-export async function downloadFile(downloadUrl) {
-  const res = await fetch(downloadUrl);
+export async function downloadFile(token, driveId, itemId) {
+  const res = await fetch(
+    `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/content`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   if (!res.ok) {
     throw new Error(`Failed to download file: ${res.status}`);
   }
