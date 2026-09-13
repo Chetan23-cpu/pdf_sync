@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import AddSitesModal from "./addSitesModal";
 import ViewSiteModal from "./viewSiteModal";
 import DeleteConfirmModal from "./deleteConfirmModal";
-import { MdEditDocument, MdDelete, MdPageview } from "react-icons/md";
+import { MdEditDocument, MdDelete, MdPageview, MdSync } from "react-icons/md";
 
 const Sitespage = () => {
   const [addSiteModal, setAddSiteModal] = useState(false);
@@ -16,6 +16,9 @@ const Sitespage = () => {
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState(null);
 
   const fetchSites = async () => {
     setLoading(true);
@@ -82,6 +85,27 @@ const Sitespage = () => {
     }
   };
 
+  const handleSyncNow = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    setError(null);
+    try {
+      const res = await fetch("/api/sync");
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || `Sync failed (${res.status})`);
+      }
+      setSyncResult(data);
+    } catch (err) {
+      setError(`Sync error: ${err.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const successCount = syncResult?.results?.filter((r) => r.status === "success").length || 0;
+  const failedCount = syncResult?.results?.filter((r) => r.status === "failed").length || 0;
+
   return (
     <>
       <div className={styles.main}>
@@ -98,14 +122,50 @@ const Sitespage = () => {
               <div className={styles.find}>
                 <input placeholder="Search here...." />
               </div>
-              <div className={styles.add} onClick={() => setAddSiteModal(true)}>
-                Add Site
+              <div style={{ display: "flex", gap: "10px" }}>
+                <div
+                  className={styles.add}
+                  onClick={handleSyncNow}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    opacity: syncing ? 0.6 : 1,
+                    cursor: syncing ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <MdSync className={syncing ? "spin" : ""} />
+                  {syncing ? "Syncing..." : "Sync Now"}
+                </div>
+                <div className={styles.add} onClick={() => setAddSiteModal(true)}>
+                  Add Site
+                </div>
               </div>
             </div>
 
             {error && (
               <div style={{ color: "#ff6b6b", padding: "10px 0" }}>
                 Error: {error}
+              </div>
+            )}
+
+            {syncResult && (
+              <div
+                style={{
+                  color: failedCount > 0 ? "#ffd54f" : "#77dd77",
+                  padding: "10px 0",
+                  fontSize: "14px",
+                }}
+              >
+                Sync complete: {successCount} succeeded, {failedCount} failed.
+                {syncResult.log?.length > 0 && (
+                  <details style={{ marginTop: "6px", color: "white", opacity: 0.8 }}>
+                    <summary style={{ cursor: "pointer" }}>View log</summary>
+                    <pre style={{ whiteSpace: "pre-wrap", fontSize: "12px" }}>
+                      {syncResult.log.join("\n")}
+                    </pre>
+                  </details>
+                )}
               </div>
             )}
 
