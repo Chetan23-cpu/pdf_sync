@@ -10,6 +10,7 @@ import {
   deleteMedia,
   pushFileToWordPress,
 } from "@/lib/wordpress";
+import { purgeLiteSpeedCache } from "@/lib/hostinger";
 import db from "@/lib/db";
 
 let storedDeltaLink;
@@ -64,6 +65,21 @@ export async function GET() {
           log.push(
             `Uploaded ${item.name} to ${site.name}: ${wpResult.source_url}`,
           );
+
+          if (site.hostinger_wp_id) {
+            try {
+              await purgeLiteSpeedCache(site.hostinger_wp_id);
+              log.push(`Purged LiteSpeed cache for ${site.name}`);
+            } catch (purgeErr) {
+              log.push(
+                `Cache purge failed for ${site.name}: ${purgeErr.message}`,
+              );
+            }
+          } else {
+            log.push(
+              `Skipped cache purge for ${site.name}: no hostinger_wp_id set`,
+            );
+          }
 
           results.push({
             file: item.name,
