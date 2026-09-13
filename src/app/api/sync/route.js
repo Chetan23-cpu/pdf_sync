@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
-import { getAccessToken, getDriveId, getDelta, downloadFile } from "@/lib/graph";
-import { findMediaByFilename, deleteMedia, pushFileToWordPress } from "@/lib/wordpress";
+import {
+  getAccessToken,
+  getDriveId,
+  getDelta,
+  downloadFile,
+} from "@/lib/graph";
+import {
+  findMediaByFilename,
+  deleteMedia,
+  pushFileToWordPress,
+} from "@/lib/wordpress";
 import db from "@/lib/db";
 
 let storedDeltaLink;
@@ -14,25 +23,41 @@ export async function GET() {
 
     const token = await getAccessToken();
     const driveId = await getDriveId(token);
-    const { items, deltaLink } = await getDelta(token, driveId, storedDeltaLink);
+    const { items, deltaLink } = await getDelta(
+      token,
+      driveId,
+      storedDeltaLink,
+    );
     log.push(`Delta returned ${items.length} changed item(s)`);
 
     // TEMPORARY DEBUG: log what each item actually looks like
     for (const item of items) {
       log.push(
-        `Item: name="${item.name}", isFolder=${!!item.folder}, isFile=${!!item.file}, isDeleted=${!!item.deleted}`
+        `Item: name="${item.name}", isFolder=${!!item.folder}, isFile=${!!item.file}, isDeleted=${!!item.deleted}`,
       );
     }
 
     const results = [];
 
     for (const item of items) {
-      if (item.deleted || !item.file || !item.name.toLowerCase().endsWith(".pdf")) {
+      if (
+        item.deleted ||
+        !item.file ||
+        !item.name.toLowerCase().endsWith(".pdf")
+      ) {
+        log.push(
+          `Skipping ${item.name}: deleted=${!!item.deleted}, notFile=${!item.file}`,
+        );
         continue;
       }
 
       const downloadUrl = item["@microsoft.graph.downloadUrl"];
-      if (!downloadUrl) continue;
+      if (!downloadUrl) {
+        log.push(
+          `Skipping ${item.name}: no downloadUrl found. Available keys: ${Object.keys(item).join(", ")}`,
+        );
+        continue;
+      }
 
       const fileBuffer = await downloadFile(downloadUrl);
       log.push(`Downloaded ${item.name} (${fileBuffer.length} bytes)`);
@@ -46,13 +71,29 @@ export async function GET() {
             log.push(`Removed old version of ${item.name} on ${site.name}`);
           }
 
-          const wpResult = await pushFileToWordPress(site, item.name, fileBuffer);
-          log.push(`Uploaded ${item.name} to ${site.name}: ${wpResult.source_url}`);
+          const wpResult = await pushFileToWordPress(
+            site,
+            item.name,
+            fileBuffer,
+          );
+          log.push(
+            `Uploaded ${item.name} to ${site.name}: ${wpResult.source_url}`,
+          );
 
-          results.push({ file: item.name, site: site.name, status: "success", url: wpResult.source_url });
+          results.push({
+            file: item.name,
+            site: site.name,
+            status: "success",
+            url: wpResult.source_url,
+          });
         } catch (err) {
           log.push(`FAILED ${item.name} on ${site.name}: ${err.message}`);
-          results.push({ file: item.name, site: site.name, status: "failed", error: err.message });
+          results.push({
+            file: item.name,
+            site: site.name,
+            status: "failed",
+            error: err.message,
+          });
         }
       }
     }
@@ -62,6 +103,9 @@ export async function GET() {
     return NextResponse.json({ ok: true, log, results });
   } catch (err) {
     log.push(`ERROR: ${err.message}`);
-    return NextResponse.json({ ok: false, log, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, log, error: err.message },
+      { status: 500 },
+    );
   }
 }
