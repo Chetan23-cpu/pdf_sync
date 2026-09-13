@@ -1,0 +1,83 @@
+.main {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 27, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.card {
+  width: 340px;
+  max-width: 90vw;
+  background: linear-gradient(to bottom, #3a3acc, #22225c);
+  border-radius: 16px;
+  padding: 30px 30px 25px 30px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.icon {
+  font-size: 40px;
+  color: #ffcc00;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.message {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.button {
+  display: flex;
+  gap: 15px;
+}
+
+.confirm {
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, #ff4d5e, #d1001f);
+  box-shadow: 0 4px 12px rgba(209, 0, 31, 0.4);
+  cursor: pointer;
+}
+.confirm:hover {
+  transform: translateY(-2px) scale(1.1);
+  transition: transform 0.5s ease;
+}
+.confirm:active {
+  transform: translateY(1px);
+}
+
+.cancel {
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+}
+.cancel:hover {
+  transform: translateY(-2px) scale(1.1);
+  transition: transform 0.5s ease;
+}
+.cancel:active {
+  transform: translateY(1px);
+}

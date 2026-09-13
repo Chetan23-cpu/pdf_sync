@@ -1,0 +1,120 @@
+.main {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 27, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  width: 420px;
+  max-width: 90vw;
+  background: linear-gradient(to bottom, #5c5cff, #3a3acc);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  padding: 20px 25px 10px 25px;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.icon {
+  font-size: 32px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.detailsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 35px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  font-size: 14px;
+  width: 100px;
+  flex-shrink: 0;
+  text-align: right;
+  opacity: 0.9;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+  background: aliceblue;
+  color: black;
+  padding: 8px 10px;
+  border-radius: 10px;
+  flex: 1;
+  word-break: break-all;
+}
+
+.value a {
+  color: #1a1a8c;
+  text-decoration: none;
+}
+
+.value a:hover {
+  text-decoration: underline;
+}
+
+.connected { color: #0F5132; }
+.unauthorized { color: #C78C06; }
+.unreachable { color: #d1001f; }
+
+.button {
+  display: flex;
+  justify-content: center;
+  padding: 15px 35px 25px 35px;
+}
+
+.close {
+  padding: 10px 30px;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, #77dd77, #2e7d32);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+  cursor: pointer;
+}
+
+.close:hover {
+  transform: translateY(-2px) scale(1.1);
+  transition: transform 0.5s ease, box-shadow 0.35s ease;
+}
+.close:active {
+  transform: translateY(1px) scale(1.0);
+}

@@ -1,0 +1,178 @@
+"use client"
+import SideNav from "../sidenav/sidenav";
+import styles from "./sites.module.css";
+import Topnav from "../topnav/topnav";
+import { useState, useEffect } from "react";
+import AddSitesModal from "./addSitesModal";
+import ViewSiteModal from "./viewSiteModal";
+import DeleteConfirmModal from "./deleteConfirmModal";
+import { MdEditDocument, MdDelete, MdPageview } from "react-icons/md";
+
+const Sitespage = () => {
+  const [addSiteModal, setAddSiteModal] = useState(false);
+  const [editingSite, setEditingSite] = useState(null);
+  const [viewingSite, setViewingSite] = useState(null);
+  const [deletingSite, setDeletingSite] = useState(null);
+  const [sites, setSites] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchSites = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/sites");
+      if (!res.ok) throw new Error("Failed to load sites");
+      const data = await res.json();
+      setSites(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSites();
+  }, []);
+
+  const handleSaveSite = async (site) => {
+    try {
+      if (site.id) {
+        await fetch(`/api/sites/${site.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(site),
+        });
+        setEditingSite(null);
+      } else {
+        await fetch("/api/sites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(site),
+        });
+        setAddSiteModal(false);
+      }
+      await fetchSites();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleConfirmDelete = async (id) => {
+    try {
+      await fetch(`/api/sites/${id}`, { method: "DELETE" });
+      setDeletingSite(null);
+      await fetchSites();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.main}>
+        <div>
+          <SideNav />
+        </div>
+        <div className={styles.topnav}>
+          <div>
+            <Topnav />
+          </div>
+          <div className={styles.card}>
+            <div className={styles.title}>SITES LIST</div>
+            <div className={styles.search}>
+              <div className={styles.find}>
+                <input placeholder="Search here...." />
+              </div>
+              <div className={styles.add} onClick={() => setAddSiteModal(true)}>
+                Add Site
+              </div>
+            </div>
+
+            {error && (
+              <div style={{ color: "#ff6b6b", padding: "10px 0" }}>
+                Error: {error}
+              </div>
+            )}
+
+            {loading ? (
+              <div style={{ color: "white", padding: "30px" }}>Loading sites...</div>
+            ) : sites.length === 0 ? (
+              <div style={{ color: "white", padding: "30px" }}>
+                No sites added yet. Click "Add Site" to get started.
+              </div>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr className={styles.tableheading}>
+                    <th className={styles.head}>S.No</th>
+                    <th className={styles.head}>Site Name</th>
+                    <th className={styles.head}>URL</th>
+                    <th className={styles.head}>Username</th>
+                    <th className={styles.head}>Status</th>
+                    <th className={styles.head}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sites.map((site, index) => (
+                    <tr key={site.id} className={styles.tablecontent}>
+                      <td className={styles.content}>{index + 1}</td>
+                      <td className={styles.content}>{site.name}</td>
+                      <td className={styles.content}>
+                        <a href={site.url} target="_blank" rel="noopener noreferrer">
+                          {site.url}
+                        </a>
+                      </td>
+                      <td className={styles.content}>{site.username}</td>
+                      <td className={styles.content}>
+                        <span className={styles[site.status]}>{site.status}</span>
+                      </td>
+                      <td className={styles.action}>
+                        <div className={styles.view} onClick={() => setViewingSite(site)}>
+                          <MdPageview />
+                        </div>
+                        <div className={styles.edit} onClick={() => setEditingSite(site)}>
+                          <MdEditDocument />
+                        </div>
+                        <div className={styles.delete} onClick={() => setDeletingSite(site)}>
+                          <MdDelete />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {addSiteModal && (
+        <AddSitesModal onClose={() => setAddSiteModal(false)} onSave={handleSaveSite} />
+      )}
+
+      {editingSite && (
+        <AddSitesModal
+          onClose={() => setEditingSite(null)}
+          onSave={handleSaveSite}
+          editingSite={editingSite}
+        />
+      )}
+
+      {viewingSite && (
+        <ViewSiteModal site={viewingSite} onClose={() => setViewingSite(null)} />
+      )}
+
+      {deletingSite && (
+        <DeleteConfirmModal
+          site={deletingSite}
+          onClose={() => setDeletingSite(null)}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
+    </>
+  );
+};
+
+export default Sitespage;
