@@ -17,6 +17,13 @@ export async function GET() {
     const { items, deltaLink } = await getDelta(token, driveId, storedDeltaLink);
     log.push(`Delta returned ${items.length} changed item(s)`);
 
+    // TEMPORARY DEBUG: log what each item actually looks like
+    for (const item of items) {
+      log.push(
+        `Item: name="${item.name}", isFolder=${!!item.folder}, isFile=${!!item.file}, isDeleted=${!!item.deleted}`
+      );
+    }
+
     const results = [];
 
     for (const item of items) {
