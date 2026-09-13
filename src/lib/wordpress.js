@@ -1,7 +1,7 @@
-// lib/wordpress.js
+// src/lib/wordpress.js
 
 export async function findMediaByFilename(site, filename) {
-  const auth = Buffer.from(`${site.username}:${site.appPassword}`).toString("base64");
+  const auth = Buffer.from(`${site.username}:${site.app_password}`).toString("base64");
   const nameWithoutExt = filename.replace(/\.pdf$/i, "");
 
   const res = await fetch(
@@ -11,14 +11,13 @@ export async function findMediaByFilename(site, filename) {
   if (!res.ok) return null;
 
   const results = await res.json();
-  // Match on the actual filename in the source_url, not just fuzzy search results
   return results.find((item) =>
     item.source_url?.toLowerCase().includes(filename.toLowerCase())
   ) || null;
 }
 
 export async function deleteMedia(site, mediaId) {
-  const auth = Buffer.from(`${site.username}:${site.appPassword}`).toString("base64");
+  const auth = Buffer.from(`${site.username}:${site.app_password}`).toString("base64");
   await fetch(`${site.url}/wp-json/wp/v2/media/${mediaId}?force=true`, {
     method: "DELETE",
     headers: { Authorization: `Basic ${auth}` },
@@ -26,7 +25,7 @@ export async function deleteMedia(site, mediaId) {
 }
 
 export async function pushFileToWordPress(site, fileName, fileBuffer, mimeType = "application/pdf") {
-  const auth = Buffer.from(`${site.username}:${site.appPassword}`).toString("base64");
+  const auth = Buffer.from(`${site.username}:${site.app_password}`).toString("base64");
 
   const res = await fetch(`${site.url}/wp-json/wp/v2/media`, {
     method: "POST",
