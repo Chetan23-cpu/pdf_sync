@@ -66,15 +66,16 @@ export async function GET() {
             `Uploaded ${item.name} to ${site.name}: ${wpResult.source_url}`,
           );
 
+          // Fire the cache purge WITHOUT awaiting it, so it doesn't
+          // slow down the response and risk a gateway timeout.
           if (site.hostinger_wp_id) {
-            try {
-              await purgeLiteSpeedCache(site.hostinger_wp_id);
-              log.push(`Purged LiteSpeed cache for ${site.name}`);
-            } catch (purgeErr) {
-              log.push(
-                `Cache purge failed for ${site.name}: ${purgeErr.message}`,
+            purgeLiteSpeedCache(site.hostinger_wp_id)
+              .then(() => log.push(`Purged LiteSpeed cache for ${site.name}`))
+              .catch((purgeErr) =>
+                log.push(
+                  `Cache purge failed for ${site.name}: ${purgeErr.message}`,
+                ),
               );
-            }
           } else {
             log.push(
               `Skipped cache purge for ${site.name}: no hostinger_wp_id set`,
